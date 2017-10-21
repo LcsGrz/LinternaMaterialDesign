@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2a2a2a">
+
+    <ImageView
+        android:id="@+id/Configuracion"
+        android:layout_width="74sp"
+        android:layout_height="73sp"
+        app:srcCompat="@drawable/config"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="14dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="14dp" />
+
+    <ImageView
+        android:id="@+id/RayoApagado"
+        android:layout_width="316sp"
+        android:layout_height="530sp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        app:srcCompat="@drawable/rayo_apagado" />
+
+    <ImageView
+        android:id="@+id/Switch_Linterna"
+        android:layout_width="224sp"
+        android:layout_height="63sp"
+        app:srcCompat="@drawable/switch_flash_on"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="14dp"
+        android:onClick="CambiarModo"/>
+
+
+</RelativeLayout>
