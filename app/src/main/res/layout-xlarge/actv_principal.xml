@@ -10,46 +10,48 @@
 
     <ImageView
         android:id="@+id/Rayo"
-        android:layout_width="316sp"
-        android:layout_height="530sp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_width="534sp"
+        android:layout_height="800sp"
         app:srcCompat="@drawable/rayo_apagado"
-        android:onClick="Encender"/>
+        android:onClick="Encender"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 
     <ImageView
         android:id="@+id/Configuracion"
-        android:layout_width="74sp"
-        android:layout_height="73sp"
+        android:layout_width="117sp"
+        android:layout_height="120sp"
         app:srcCompat="@drawable/config"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginRight="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
         android:onClick="AbrirConfiguracion"/>
 
     <ImageView
         android:id="@+id/Switch_Linterna"
-        android:layout_width="160sp"
-        android:layout_height="45sp"
+        android:layout_width="224sp"
+        android:layout_height="63sp"
         app:srcCompat="@drawable/switch_flash_on"
-        android:layout_marginTop="15dp"
-        android:onClick="CambiarModo"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:onClick="CambiarModo"/>
 
     <ImageView
         android:id="@+id/imageView3"
-        android:layout_width="42sp"
-        android:layout_height="50sp"
+        android:layout_width="76sp"
+        android:layout_height="81sp"
         app:srcCompat="@drawable/timer"
+        android:layout_alignBottom="@+id/Configuracion"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginLeft="15dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginBottom="27dp"/>
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="40dp" />
 
 
 </RelativeLayout>

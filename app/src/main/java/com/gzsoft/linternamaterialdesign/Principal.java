@@ -3,6 +3,7 @@ package com.gzsoft.linternamaterialdesign;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +12,13 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.security.Policy;
+
 public class Principal extends AppCompatActivity {
+
+    Camera camara;
+    Camera.Parameters parametrosCamara;
+    ImageView Switch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +26,7 @@ public class Principal extends AppCompatActivity {
         setContentView(R.layout.actv_principal);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN); //Elimino la barra de navegacion
         VerificarPermisoCamara(); //Verifico si el permiso esta activado
-
+        PrepararCamara();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -45,9 +52,53 @@ public class Principal extends AppCompatActivity {
     }
 
     //----------------------------------------------------------------------------------------------
+    //------------------------------------------------------------COMPORTAMIENTO Y ENCENDER LINTERNA
+    Boolean conProblemas = true;
+    public void PrepararCamara() {
+        Switch = (ImageView) findViewById(R.id.Switch_Linterna);
+
+        if (getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+            conProblemas = false;
+
+            if(camara == null) {
+                try {
+                    camara = Camera.open();
+                    parametrosCamara = camara.getParameters();
+                }
+                catch (Exception ex){
+                    conProblemas = true;
+                }
+            }
+        }
+        if (conProblemas) { // si hubo problemas, desabilito los botones de flash de camara
+            Toast.makeText(this,"Hubo problemas con la camara",Toast.LENGTH_LONG);
+            Switch.setImageResource(R.drawable.switch_flash_off);
+            flash = false;
+        }
+    }
+
+    boolean encendido = false;
+    ImageView Rayo;
+
     public void Encender(View v) {
         if (flash) {
+            if(camara != null) {
+                Rayo = (ImageView) findViewById(R.id.Rayo);
+                encendido = !encendido;
+                if (encendido) {
+                    Rayo.setImageResource(R.drawable.rayo_prendido);
 
+                    parametrosCamara.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                    camara.setParameters(parametrosCamara);
+                    camara.startPreview();
+                } else {
+                    Rayo.setImageResource(R.drawable.rayo_apagado);
+
+                    parametrosCamara.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                    camara.setParameters(parametrosCamara);
+                    camara.stopPreview();
+                }
+            }
         } else {
             Intent intent = new Intent(v.getContext(), LinternaPantalla.class);
             startActivityForResult(intent, 0);
@@ -55,15 +106,21 @@ public class Principal extends AppCompatActivity {
     }
 
     boolean flash = true;
-    ImageView Switch;
 
     public void CambiarModo(View v) {
-        Switch = (ImageView) findViewById(R.id.Switch_Linterna);
-        flash = !flash;
-        if (flash) {
-            Switch.setImageResource(R.drawable.switch_flash_on);
-        } else {
-            Switch.setImageResource(R.drawable.switch_flash_off);
+        if (!conProblemas) { //Si no hubo problemas con la camara, me permite cambiar los tipos de linterna
+            flash = !flash;
+            if (flash) {
+                Switch.setImageResource(R.drawable.switch_flash_on);
+            } else {
+                Switch.setImageResource(R.drawable.switch_flash_off);
+            }
         }
+    }
+    //----------------------------------------------------------------------------------------------
+    //------------------------------------------------------------COMPORTAMIENTO Y ENCENDER LINTERNA
+    public void AbrirConfiguracion(View v){
+        Intent intent = new Intent(v.getContext(), Configuraciones.class);
+        startActivityForResult(intent, 0);
     }
 }
