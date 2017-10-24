@@ -2,17 +2,15 @@ package com.gzsoft.linternamaterialdesign;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import java.security.Policy;
 
 public class Principal extends AppCompatActivity {
 
@@ -24,9 +22,16 @@ public class Principal extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.actv_principal);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN); //Elimino la barra de navegacion
+        Configuraciones.EsconderBarra(findViewById(R.id.view_Principal)); //Elimino la barra de navegacion
         VerificarPermisoCamara(); //Verifico si el permiso esta activado
-        PrepararCamara();
+        PrepararCamara(); // Verifica si tiene camara y flash
+        LeerDatos(); //Lee los datos guardados
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Configuraciones.EsconderBarra(findViewById(R.id.view_Principal)); //Elimino la barra de navegacion
     }
 
     //----------------------------------------------------------------------------------------------
@@ -39,6 +44,7 @@ public class Principal extends AppCompatActivity {
         }
     }
 
+    boolean aceptoTarde = false;
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (123 == requestCode) {
@@ -49,6 +55,9 @@ public class Principal extends AppCompatActivity {
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+        Switch.setImageResource(R.drawable.switch_flash_on);
+        flash = true;
+        PrepararCamara();
     }
 
     //----------------------------------------------------------------------------------------------
@@ -85,13 +94,13 @@ public class Principal extends AppCompatActivity {
             if(camara != null) {
                 Rayo = (ImageView) findViewById(R.id.Rayo);
                 encendido = !encendido;
-                if (encendido) {
+                if (encendido) { //Enciendo
                     Rayo.setImageResource(R.drawable.rayo_prendido);
 
                     parametrosCamara.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
                     camara.setParameters(parametrosCamara);
                     camara.startPreview();
-                } else {
+                } else { //Apago
                     Rayo.setImageResource(R.drawable.rayo_apagado);
 
                     parametrosCamara.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
@@ -123,4 +132,11 @@ public class Principal extends AppCompatActivity {
         Intent intent = new Intent(v.getContext(), Configuraciones.class);
         startActivityForResult(intent, 0);
     }
+    public void LeerDatos() {
+        SharedPreferences preferencias = getSharedPreferences("Configuracion",0);
+        Configuraciones.brillo = preferencias.getFloat("brillo", 100.0F);
+    }
 }
+
+
+

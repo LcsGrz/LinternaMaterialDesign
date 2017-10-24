@@ -1,6 +1,5 @@
 package com.gzsoft.linternamaterialdesign;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -23,10 +22,11 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.actv_linterna_pantalla);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN); //Elimino la barra de navegacion
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //No permito a la pantalla apagarse
+        Configuraciones.EsconderBarra(findViewById(R.id.LinternaPantalla)); //Elimino la barra de navegacion
         //---------------Seteo brillo default de la configuracion
         parametroDiseño = getWindow().getAttributes();
-        parametroDiseño.screenBrightness = Configuraciones.brillo;
+        parametroDiseño.screenBrightness = Configuraciones.brillo/100;
         getWindow().setAttributes(parametroDiseño);
         //-------------------------------------------------------
         detectorGestos = new GestureDetector(LinternaPantalla.this, LinternaPantalla.this);
@@ -35,7 +35,6 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
         pantalla.setBackgroundColor(Configuraciones.color);
         //-------------------------------------------------------
     }
-
     //----------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------GESTOS SWIPE
     @Override
