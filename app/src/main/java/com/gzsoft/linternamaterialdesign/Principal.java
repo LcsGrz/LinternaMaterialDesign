@@ -122,6 +122,7 @@ public class Principal extends AppCompatActivity {
                 if (camara != null) {
                     Rayo = (ImageView) findViewById(R.id.Rayo);
                     encendido = !encendido;
+                    prendioConFlash = !prendioConFlash;
                     if (encendido) { //Enciendo
                         Rayo.setImageResource(R.drawable.rayo_prendido);
 
@@ -138,7 +139,6 @@ public class Principal extends AppCompatActivity {
                         camara.stopPreview();
 
                         notiManager.cancel(10);
-                        notiManager = null;
                         if (Timer != null) {
                             Timer.cancel();
                             tvTimer.setText("MM:SS");
@@ -152,7 +152,9 @@ public class Principal extends AppCompatActivity {
             }
         } else {
             Intent intent = new Intent(findViewById(R.id.view_Principal).getContext(), LinternaPantalla.class);
-            startActivityForResult(intent, 0);
+            intent.putExtra("apagar", ((minutos * 60 + segundos) * 1000));
+            startActivity(intent);
+
         }
     }
 
@@ -207,6 +209,7 @@ public class Principal extends AppCompatActivity {
     View TimerPersonalizado;
     TextView tvTimer;
     CountDownTimer Timer;
+    boolean prendioConFlash = false;
 
     public void TimerFlash(View v) {
         tvTimer = (TextView) findViewById(R.id.tvTimer);
@@ -235,7 +238,10 @@ public class Principal extends AppCompatActivity {
                             tvTimer.setText(minutos + ":" + segundos);
                         }
                         Configuraciones.EsconderBarra(findViewById(R.id.view_Principal));
-
+                        if (Timer != null) {
+                            Timer.cancel();
+                        }
+                        Timer = null;
                         int tiempo = (minutos * 60 + segundos) * 1000;
                         if (!encendido && tiempo > 0) {
                             Encender(null);
@@ -261,7 +267,13 @@ public class Principal extends AppCompatActivity {
 
                                 public void onFinish() {
                                     tvTimer.setText("MM:SS");
-                                    Encender(null);
+                                    minutos = 0;
+                                    segundos = 0;
+                                    if (prendioConFlash) {
+                                        flash = true;
+                                        Encender(null);
+                                        flash = false;
+                                    }
                                 }
                             }.start();
                         } else {

@@ -18,6 +18,7 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
     GestureDetector detectorGestos;
     LinearLayout pantalla;
     CountDownTimer timer;
+    CountDownTimer timerApagado;
     //----------------------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------CONSTRUCTOR
     @Override
@@ -37,6 +38,7 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
         pantalla.setBackgroundColor(Configuraciones.color);
         //-------------------------------------------------------
         if (Configuraciones.tiempoColor > 0){iniciarTimer();}
+        if(getIntent().getExtras().getInt("apagar")>0){iniciarTimerApagado();}
     }
 
     //----------------------------------------------------------------------------------------------
@@ -105,6 +107,17 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
                 Random aleatorio = new Random();
                 pantalla.setBackgroundColor(Color.argb(255, aleatorio.nextInt(255), aleatorio.nextInt(255), aleatorio.nextInt(255)));
                 iniciarTimer();
+            }
+        }.start();
+    }
+    public void iniciarTimerApagado(){
+        timerApagado = new CountDownTimer(getIntent().getExtras().getInt("apagar"), 1000) {
+
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+             finish();
             }
         }.start();
     }
