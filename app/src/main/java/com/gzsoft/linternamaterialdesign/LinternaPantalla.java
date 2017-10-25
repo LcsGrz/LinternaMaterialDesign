@@ -2,6 +2,7 @@ package com.gzsoft.linternamaterialdesign;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -16,6 +17,7 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
     WindowManager.LayoutParams parametroDiseño;
     GestureDetector detectorGestos;
     LinearLayout pantalla;
+    CountDownTimer timer;
     //----------------------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------CONSTRUCTOR
     @Override
@@ -26,7 +28,7 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
         Configuraciones.EsconderBarra(findViewById(R.id.LinternaPantalla)); //Elimino la barra de navegacion
         //---------------Seteo brillo default de la configuracion
         parametroDiseño = getWindow().getAttributes();
-        parametroDiseño.screenBrightness = Configuraciones.brillo/100;
+        parametroDiseño.screenBrightness = Configuraciones.brillo / 100;
         getWindow().setAttributes(parametroDiseño);
         //-------------------------------------------------------
         detectorGestos = new GestureDetector(LinternaPantalla.this, LinternaPantalla.this);
@@ -34,7 +36,9 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
         pantalla = (LinearLayout) findViewById(R.id.LinternaPantalla);
         pantalla.setBackgroundColor(Configuraciones.color);
         //-------------------------------------------------------
+        if (Configuraciones.tiempoColor > 0){iniciarTimer();}
     }
+
     //----------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------GESTOS SWIPE
     @Override
@@ -71,12 +75,12 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
     //--------------------------------------BRILLO - COLOR------------------------------------------
     @Override
     public boolean onFling(MotionEvent motionEvent1, MotionEvent motionEvent2, float v, float v1) {
-        if ((motionEvent1.getY() - motionEvent2.getY() > 50)&& Configuraciones.cambiarBrillo) {
+        if ((motionEvent1.getY() - motionEvent2.getY() > 50) && Configuraciones.cambiarBrillo) {
             if ((motionEvent1.getY() - motionEvent2.getY() > 0) && (motionEvent1.getY() - motionEvent2.getY() < 1000)) {
                 float brillo = motionEvent1.getY() - motionEvent2.getY();
                 parametroDiseño.screenBrightness = brillo / 1000.0F;
             }
-        } else if ((motionEvent2.getY() - motionEvent1.getY() > 50)&& Configuraciones.cambiarBrillo) {
+        } else if ((motionEvent2.getY() - motionEvent1.getY() > 50) && Configuraciones.cambiarBrillo) {
             if ((motionEvent2.getY() - motionEvent1.getY() > 0) && (motionEvent2.getY() - motionEvent1.getY() < 1000)) {
                 float brillo = motionEvent2.getY() - motionEvent1.getY();
                 parametroDiseño.screenBrightness = (1000 - brillo) / 1000.0F;
@@ -91,4 +95,17 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
         return true;
     }
     //----------------------------------------------------------------------------------------------
+    public void iniciarTimer(){
+        timer = new CountDownTimer((long)(Configuraciones.tiempoColor*1000.0F), 1) {
+
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+                Random aleatorio = new Random();
+                pantalla.setBackgroundColor(Color.argb(255, aleatorio.nextInt(255), aleatorio.nextInt(255), aleatorio.nextInt(255)));
+                iniciarTimer();
+            }
+        }.start();
+    }
 }

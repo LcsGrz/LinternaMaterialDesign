@@ -1,7 +1,6 @@
 package com.gzsoft.linternamaterialdesign;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
@@ -23,15 +21,18 @@ public class Configuraciones extends AppCompatActivity {
     //----------------------------------------------------------------------------VARIABLES GLOBALES
     public static boolean colorAleatorio = true;
     public static boolean cambiarBrillo = true;
-    public static boolean EncenderIniciarPantalla = true;
-    public static boolean EncenderIniciarFlash = true;
+    public static boolean EncenderIniciarPantalla = false;
+    public static boolean EncenderIniciarFlash = false;
     public static float brillo = 100.0F;
+    public static float tiempoColor = 0.0F;
     public static int color = Color.WHITE;
     //----------------------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------COMPONENTES
     SeekBar skBrillo;
+    SeekBar skTiempoColor;
 
     TextView tvProcentajeBrillo;
+    TextView tvTiempoColor;
 
     CheckBox cbColorAleatorio;
     CheckBox cbCambiarBrillo;
@@ -49,6 +50,7 @@ public class Configuraciones extends AppCompatActivity {
         LeerDatos();
         setComponentes();
         skBrillo_Listener();
+        skTiempoColor_Listener();
     }
 
     @Override
@@ -60,8 +62,6 @@ public class Configuraciones extends AppCompatActivity {
     //----------------------------------------------------------------INICIALIZACIONES & COMPONENTES
 
     public void skBrillo_Listener() {
-        final TextView procentajeBrillo = (TextView) findViewById(R.id.tvPorcentajeBrillo);
-        skBrillo = (SeekBar) findViewById(R.id.sbBrillo);
         skBrillo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -75,7 +75,26 @@ public class Configuraciones extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 brillo = progress;
-                procentajeBrillo.setText(Integer.toString(progress) + '%');
+                tvProcentajeBrillo.setText(Integer.toString(progress) + '%');
+            }
+        });
+    }
+
+    public void skTiempoColor_Listener() {
+        skTiempoColor.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                tiempoColor = progress / 1000.0f;
+                tvTiempoColor.setText(Float.toString(tiempoColor) + " Segs");
             }
         });
     }
@@ -112,6 +131,7 @@ public class Configuraciones extends AppCompatActivity {
     public void setCbColorAleatorio(View v) {
         colorAleatorio = !colorAleatorio;
     }
+
     public void setCbEncenderIniciarPantalla(View v) {
         EncenderIniciarPantalla = !EncenderIniciarPantalla;
     }
@@ -132,6 +152,7 @@ public class Configuraciones extends AppCompatActivity {
         SharedPreferences preferencias = getSharedPreferences("Configuracion", 0);
         color = preferencias.getInt("color", -1);
         brillo = preferencias.getFloat("brillo", 100.0F);
+        tiempoColor = preferencias.getFloat("tiempoColor", 0.0F);
         colorAleatorio = preferencias.getBoolean("colorAleatorio", true);
         cambiarBrillo = preferencias.getBoolean("cambiarBrillo", true);
         EncenderIniciarPantalla = preferencias.getBoolean("EncenderIniciarPantalla", false);
@@ -145,6 +166,12 @@ public class Configuraciones extends AppCompatActivity {
 
         skBrillo = (SeekBar) findViewById(R.id.sbBrillo);
         skBrillo.setProgress((int) brillo);
+        //------------------------------------------------------------------------
+        tvTiempoColor = (TextView) findViewById(R.id.tvTiempoColor);
+        tvTiempoColor.setText(Float.toString(tiempoColor) + " Segs");
+
+        skTiempoColor = (SeekBar) findViewById(R.id.skTiempoColor);
+        skTiempoColor.setProgress((int) (tiempoColor * 1000.0F));
         //------------------------------------------------------------------------
         cbColorAleatorio = (CheckBox) findViewById(R.id.cbColorAleatorio);
         cbColorAleatorio.setChecked(colorAleatorio);
@@ -166,6 +193,7 @@ public class Configuraciones extends AppCompatActivity {
         SharedPreferences.Editor editor = getSharedPreferences("Configuracion", 0).edit();
         editor.putInt("color", color);
         editor.putFloat("brillo", brillo);
+        editor.putFloat("tiempoColor", tiempoColor);
         editor.putBoolean("colorAleatorio", colorAleatorio);
         editor.putBoolean("cambiarBrillo", cambiarBrillo);
         editor.putBoolean("EncenderIniciarPantalla", EncenderIniciarPantalla);
