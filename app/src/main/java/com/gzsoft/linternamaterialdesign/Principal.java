@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,6 +28,9 @@ public class Principal extends AppCompatActivity {
         VerificarPermisoCamara(); //Verifico si el permiso esta activado
         PrepararCamara(); // Verifica si tiene camara y flash
         LeerDatos(); //Lee los datos guardados
+        if(!encendido) {
+            EncenderIniciar();//Prende la linterna al iniciar si esta activado
+        }
     }
 
     @Override
@@ -33,7 +38,6 @@ public class Principal extends AppCompatActivity {
         super.onResume();
         Configuraciones.EsconderBarra(findViewById(R.id.view_Principal)); //Elimino la barra de navegacion
     }
-
     //----------------------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------VERIFICAR PERMISO
     private void VerificarPermisoCamara() {
@@ -44,7 +48,6 @@ public class Principal extends AppCompatActivity {
         }
     }
 
-    boolean aceptoTarde = false;
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (123 == requestCode) {
@@ -91,6 +94,7 @@ public class Principal extends AppCompatActivity {
 
     public void Encender(View v) {
         if (flash) {
+            try{
             if(camara != null) {
                 Rayo = (ImageView) findViewById(R.id.Rayo);
                 encendido = !encendido;
@@ -108,8 +112,13 @@ public class Principal extends AppCompatActivity {
                     camara.stopPreview();
                 }
             }
+            }
+            catch (Exception ex){
+                camara = null;
+                PrepararCamara();
+            }
         } else {
-            Intent intent = new Intent(v.getContext(), LinternaPantalla.class);
+            Intent intent = new Intent( findViewById(R.id.view_Principal).getContext(), LinternaPantalla.class);
             startActivityForResult(intent, 0);
         }
     }
@@ -127,7 +136,7 @@ public class Principal extends AppCompatActivity {
         }
     }
     //----------------------------------------------------------------------------------------------
-    //------------------------------------------------------------COMPORTAMIENTO Y ENCENDER LINTERNA
+    //-------------------------------------------------------------------------------------FUNCIONES
     public void AbrirConfiguracion(View v){
         Intent intent = new Intent(v.getContext(), Configuraciones.class);
         startActivityForResult(intent, 0);
@@ -135,6 +144,16 @@ public class Principal extends AppCompatActivity {
     public void LeerDatos() {
         SharedPreferences preferencias = getSharedPreferences("Configuracion",0);
         Configuraciones.brillo = preferencias.getFloat("brillo", 100.0F);
+    }
+    public void EncenderIniciar(){
+        if(Configuraciones.EncenderIniciarFlash){
+            Encender(null);
+        }
+        if(Configuraciones.EncenderIniciarPantalla){
+            Switch.setImageResource(R.drawable.switch_flash_off);
+            flash = false;
+            Encender(null);
+        }
     }
 }
 

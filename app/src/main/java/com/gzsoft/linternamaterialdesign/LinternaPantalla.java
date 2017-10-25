@@ -71,12 +71,12 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
     //--------------------------------------BRILLO - COLOR------------------------------------------
     @Override
     public boolean onFling(MotionEvent motionEvent1, MotionEvent motionEvent2, float v, float v1) {
-        if (motionEvent1.getY() - motionEvent2.getY() > 50) {
+        if ((motionEvent1.getY() - motionEvent2.getY() > 50)&& Configuraciones.cambiarBrillo) {
             if ((motionEvent1.getY() - motionEvent2.getY() > 0) && (motionEvent1.getY() - motionEvent2.getY() < 1000)) {
                 float brillo = motionEvent1.getY() - motionEvent2.getY();
                 parametroDiseño.screenBrightness = brillo / 1000.0F;
             }
-        } else if (motionEvent2.getY() - motionEvent1.getY() > 50) {
+        } else if ((motionEvent2.getY() - motionEvent1.getY() > 50)&& Configuraciones.cambiarBrillo) {
             if ((motionEvent2.getY() - motionEvent1.getY() > 0) && (motionEvent2.getY() - motionEvent1.getY() < 1000)) {
                 float brillo = motionEvent2.getY() - motionEvent1.getY();
                 parametroDiseño.screenBrightness = (1000 - brillo) / 1000.0F;

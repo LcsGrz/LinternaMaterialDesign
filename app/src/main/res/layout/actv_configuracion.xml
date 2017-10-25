@@ -5,65 +5,95 @@
     android:id="@+id/Configuracion">
 
     <CheckBox
-        android:id="@+id/checkBox"
+        android:id="@+id/cbColorAleatorio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="240dp"
+        android:layout_marginTop="147dp"
         android:checked="true"
         android:text="Deslizar para cambiar de color"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/textView"
+        android:layout_alignLeft="@+id/sbBrillo"
+        android:layout_alignStart="@+id/sbBrillo"
+        android:onClick="setCbColorAleatorio"/>
+
+    <CheckBox
+        android:id="@+id/cbEncenderIniciarPantalla"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:text="Encender al iniciar"
+        android:layout_above="@+id/cbCambiarBrillo"
+        android:layout_toLeftOf="@+id/textView2"
+        android:layout_toStartOf="@+id/textView2"
+        android:layout_marginBottom="29dp"
+        android:onClick="setCbEncenderIniciarPantalla"/>
+
+    <CheckBox
+        android:id="@+id/cbEncenderIniciarFlash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:text="Encender al iniciar"
+        android:layout_above="@+id/textView"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignStart="@+id/textView2"
+        android:layout_marginBottom="12dp"
+        android:onClick="setCbEncenderIniciarFlash"/>
+
+    <CheckBox
+        android:id="@+id/cbCambiarBrillo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="Deslizar para cambiar el brillo"
+        android:layout_alignBottom="@+id/cbColorAleatorio"
+        android:layout_alignLeft="@+id/cbColorAleatorio"
+        android:layout_alignStart="@+id/cbColorAleatorio"
+        android:layout_marginLeft="11dp"
+        android:layout_marginStart="11dp"
+        android:layout_marginBottom="54dp"
+        android:onClick="setCbCambiarBrillo"/>
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="45dp"
-        android:layout_marginEnd="34dp"
-        android:layout_marginRight="34dp"
         android:text="PANTALLA"
-        android:layout_alignBottom="@+id/checkBox"
-        android:layout_alignRight="@+id/checkBox"
-        android:layout_alignEnd="@+id/checkBox" />
+        android:layout_below="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="76dp" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="22dp"
         android:text="FLASH"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignRight="@+id/cuadraditoColor"
+        android:layout_alignEnd="@+id/cuadraditoColor" />
 
     <SeekBar
         android:id="@+id/sbBrillo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="17dp"
+        android:layout_marginTop="40dp"
         android:max="100"
         android:progress="100"
-        android:layout_below="@+id/textView3"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_alignLeft="@+id/textView5"
-        android:layout_alignStart="@+id/textView5" />
+        android:layout_below="@+id/cbColorAleatorio"
+        android:layout_alignLeft="@+id/textView4"
+        android:layout_alignStart="@+id/textView4" />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/checkBox"
-        android:layout_alignStart="@+id/checkBox"
-        android:layout_below="@+id/checkBox"
-        android:layout_marginLeft="11dp"
-        android:layout_marginStart="11dp"
-        android:layout_marginTop="22dp"
-        android:text="Brillo al iniciar" />
+
+        android:text="Brillo al iniciar"
+        android:layout_above="@+id/tvPorcentajeBrillo"
+        android:layout_alignRight="@+id/textView6"
+        android:layout_alignEnd="@+id/textView6"
+        android:layout_marginBottom="7dp" />
 
     <SeekBar
         android:id="@+id/seekBar3"
@@ -92,8 +122,7 @@
         android:layout_height="wrap_content"
         android:text="Dejar en 0 para desactivar"
         android:layout_below="@+id/seekBar3"
-        android:layout_alignRight="@+id/checkBox"
-        android:layout_alignEnd="@+id/checkBox"
+
         android:layout_marginRight="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="20dp" />
@@ -109,12 +138,14 @@
         android:text="Color al iniciar" />
 
     <LinearLayout
-        android:layout_width="20sp"
-        android:layout_height="20sp"
+        android:id="@+id/cuadraditoColor"
+        android:layout_width="30sp"
+        android:layout_height="30sp"
         android:layout_alignBottom="@+id/textView6"
         android:layout_centerHorizontal="true"
         android:background="#fff"
-        android:onClick="CambiarColor"></LinearLayout>
+        android:onClick="CambiarColor"
+        android:orientation="horizontal"></LinearLayout>
 
     <TextView
         android:id="@+id/tvPorcentajeBrillo"
@@ -122,7 +153,6 @@
         android:layout_height="wrap_content"
         android:text="100%"
         android:layout_above="@+id/textView4"
-        android:layout_alignLeft="@+id/checkBox"
-        android:layout_alignStart="@+id/checkBox" />
+ />
 
 </RelativeLayout>
