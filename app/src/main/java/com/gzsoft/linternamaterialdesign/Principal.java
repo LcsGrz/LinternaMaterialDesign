@@ -14,20 +14,25 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
+import android.widget.ProgressBar;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class Principal extends AppCompatActivity {
 
-    Camera camara;
-    Camera.Parameters parametrosCamara;
+    public static Camera camara;
+    public static Camera.Parameters parametrosCamara;
     ImageView Switch;
 
-    NotificationManager notiManager;
+    public static NotificationManager notiManager;
     RemoteViews remoteV;
     NotificationCompat.Builder builder;
 
@@ -59,9 +64,11 @@ public class Principal extends AppCompatActivity {
         if (notiManager != null) {
             notiManager.cancel(10);
         }
+        if(encendido){
+            Encender(null);
+        }
         super.onDestroy();
     }
-
     //----------------------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------VERIFICAR PERMISO
     private void VerificarPermisoCamara() {
@@ -113,8 +120,8 @@ public class Principal extends AppCompatActivity {
         }
     }
 
-    boolean encendido = false;
-    ImageView Rayo;
+    public static boolean encendido = false;
+    public static ImageView Rayo;
 
     public void Encender(View v) {
         if (flash) {
@@ -158,7 +165,7 @@ public class Principal extends AppCompatActivity {
         }
     }
 
-    boolean flash = true;
+    public static boolean flash = true;
 
     public void CambiarModo(View v) {
         if (!conProblemas) { //Si no hubo problemas con la camara, me permite cambiar los tipos de linterna
@@ -209,7 +216,7 @@ public class Principal extends AppCompatActivity {
     View TimerPersonalizado;
     TextView tvTimer;
     CountDownTimer Timer;
-    boolean prendioConFlash = false;
+    public static boolean prendioConFlash = false;
 
     public void TimerFlash(View v) {
         tvTimer = (TextView) findViewById(R.id.tvTimer);
@@ -299,21 +306,58 @@ public class Principal extends AppCompatActivity {
         remoteV.setImageViewResource(R.id.noti_icon, R.drawable.rayo_notif);
         remoteV.setTextViewText(R.id.txtTitle, "Linterna Activa");
         //-----------------------------------------------------------------------------------------------------------------------------
-        final int notification_id = (int) System.currentTimeMillis();
-        Intent button_intent = new Intent("button_click");
-        button_intent.putExtra("dato_a_pasar", 10);
-        PendingIntent p_intent = PendingIntent.getBroadcast(this, 123, button_intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        remoteV.setOnClickPendingIntent(R.id.btnDesactivar, p_intent);
+        //final int notification_id = (int) System.currentTimeMillis();
+        //Intent button_intent = new Intent("button_click");
+        //button_intent.putExtra("ok",true);
+        //PendingIntent p_intent = PendingIntent.getBroadcast(this, 123, button_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //remoteV.setOnClickPendingIntent(R.id.btnDesactivar, p_intent);
         //----------------------------------------------------------------------------------------------------------------------------
         Intent notification_1 = new Intent(getApplicationContext(), Principal.class);
         PendingIntent pending = PendingIntent.getActivity(getApplicationContext(), 0, notification_1, 0);
         builder = new NotificationCompat.Builder(getApplicationContext());
         builder.setSmallIcon(R.mipmap.ic_launcher)
-                .setAutoCancel(false)
+                .setAutoCancel(true)
                 .setCustomBigContentView(remoteV)
                 .setContentIntent(pending);
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.toast_p, (ViewGroup) findViewById(R.id.relativeLayout1));
+        ProgressBar np = view.findViewById(R.id.pbToast);
+        Toast toast = new Toast(getApplicationContext());
+        toast.setView(view);
+        toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL,0,100);
+
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP)  {
+           Configuraciones.intermitencia++;
+            np.setProgress( Configuraciones.intermitencia);
+
+            toast.show();
+
+            return true; }
+        if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            Configuraciones.intermitencia--;
+            np.setProgress( Configuraciones.intermitencia);
+
+            toast.show();
+
+            return true; }
+        if(keyCode == KeyEvent.KEYCODE_HEADSETHOOK) {
+            Encender(null);
+
+            return true; }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        //Encender(null);
+        //super.onNewIntent(intent);
+        finish();
+    }
 }
 
 

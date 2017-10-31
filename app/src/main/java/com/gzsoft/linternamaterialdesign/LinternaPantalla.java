@@ -41,6 +41,14 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
         if(getIntent().getExtras().getInt("apagar")>0){iniciarTimerApagado();}
     }
 
+    @Override
+    protected void onDestroy() {
+        if(timer != null){
+            timer.cancel();
+        }
+        super.onDestroy();
+    }
+
     //----------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------GESTOS SWIPE
     @Override

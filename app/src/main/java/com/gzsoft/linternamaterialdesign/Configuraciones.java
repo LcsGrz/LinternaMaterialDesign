@@ -5,11 +5,13 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
@@ -26,6 +28,7 @@ public class Configuraciones extends AppCompatActivity {
     public static float brillo = 100.0F;
     public static float tiempoColor = 0.0F;
     public static int color = Color.WHITE;
+    public static int intermitencia= 0;
     //----------------------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------COMPONENTES
     SeekBar skBrillo;
@@ -36,6 +39,7 @@ public class Configuraciones extends AppCompatActivity {
 
     CheckBox cbColorAleatorio;
     CheckBox cbCambiarBrillo;
+
     CheckBox cbEncenderIniciarPantalla;
     CheckBox cbEncenderIniciarFlash;
 
@@ -148,7 +152,7 @@ public class Configuraciones extends AppCompatActivity {
         setComponentes();
     }
 
-    private void LeerDatos() {
+    public void LeerDatos() {
         SharedPreferences preferencias = getSharedPreferences("Configuracion", 0);
         color = preferencias.getInt("color", -1);
         brillo = preferencias.getFloat("brillo", 100.0F);
@@ -210,4 +214,5 @@ public class Configuraciones extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
+
 }
