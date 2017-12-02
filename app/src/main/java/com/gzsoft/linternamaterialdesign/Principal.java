@@ -1,17 +1,29 @@
 package com.gzsoft.linternamaterialdesign;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.view.Gravity;
@@ -19,6 +31,8 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
@@ -39,14 +53,52 @@ public class Principal extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.actv_principal);
         Configuraciones.EsconderBarra(findViewById(R.id.view_Principal)); //Elimino la barra de navegacion
         VerificarPermisoCamara(); //Verifico si el permiso esta activado
         PrepararCamara(); // Verifica si tiene camara y flash
         LeerDatos(); //Lee los datos guardados
         PrenderNotificacion();
+        crearToast();
+    ////--------------------------------------------------------------
+//        if (checkDrawOverlayPermission()) {
+//            startService(new Intent(this, Servicio.class));
+//        }
+        shakeM();
     }
+    private SensorManager sm;
+    private float acelVal,acelLast,shake;
 
+    public void shakeM(){
+        sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sm.registerListener(sensorListener,sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),SensorManager.SENSOR_DELAY_NORMAL);
+
+        acelVal = SensorManager.GRAVITY_EARTH;
+        acelLast = SensorManager.GRAVITY_EARTH;
+        shake = 0.00f;
+    }
+    private  final SensorEventListener sensorListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            float x = event.values[0], y= event.values[1],z= event.values[2];
+            acelLast = acelVal;
+            acelVal = (float) Math.sqrt((double)(x*x+y*y+z*z));
+            float delta= acelVal - acelLast;
+            shake = shake*0.9f + delta;
+
+            if(shake > 12){
+                //Toast.makeText(Principal.this, "Shake", Toast.LENGTH_SHORT).show();
+                Encender(null);
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
+    //----------------------------------------------------------------------------------------------
     boolean primeraVez = true;
 
     @Override
@@ -69,7 +121,7 @@ public class Principal extends AppCompatActivity {
         }
         super.onDestroy();
     }
-    //----------------------------------------------------------------------------------------------
+
     //-----------------------------------------------------------------------------VERIFICAR PERMISO
     private void VerificarPermisoCamara() {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
@@ -80,7 +132,7 @@ public class Principal extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (123 == requestCode) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Por favor activa el permiso", Toast.LENGTH_LONG).show();
@@ -98,6 +150,7 @@ public class Principal extends AppCompatActivity {
     //------------------------------------------------------------COMPORTAMIENTO Y ENCENDER LINTERNA
     Boolean conProblemas = true;
 
+    @SuppressLint("ShowToast")
     public void PrepararCamara() {
         Switch = (ImageView) findViewById(R.id.Switch_Linterna);
 
@@ -121,8 +174,10 @@ public class Principal extends AppCompatActivity {
     }
 
     public static boolean encendido = false;
+    @SuppressLint("StaticFieldLeak")
     public static ImageView Rayo;
 
+    @SuppressLint("SetTextI18n")
     public void Encender(View v) {
         if (flash) {
             try {
@@ -139,7 +194,7 @@ public class Principal extends AppCompatActivity {
 
                         notiManager.notify(10, builder.build());
                     } else { //Apago
-                        Rayo.setImageResource(R.drawable.rayo_apagado);
+                       Rayo.setImageResource(R.drawable.rayo_apagado);
 
                         parametrosCamara.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
                         camara.setParameters(parametrosCamara);
@@ -158,7 +213,7 @@ public class Principal extends AppCompatActivity {
                 PrepararCamara();
             }
         } else {
-            Intent intent = new Intent(findViewById(R.id.view_Principal).getContext(), LinternaPantalla.class);
+            Intent intent = new Intent((findViewById(R.id.view_Principal)).getContext(), LinternaPantalla.class);
             intent.putExtra("apagar", ((minutos * 60 + segundos) * 1000));
             startActivity(intent);
 
@@ -177,7 +232,6 @@ public class Principal extends AppCompatActivity {
             }
         }
     }
-
     //----------------------------------------------------------------------------------------------
     //-------------------------------------------------------------------------------------FUNCIONES
     public void AbrirConfiguracion(View v) {
@@ -244,12 +298,13 @@ public class Principal extends AppCompatActivity {
                         } else {
                             tvTimer.setText(minutos + ":" + segundos);
                         }
-                        Configuraciones.EsconderBarra(findViewById(R.id.view_Principal));
+                        //Configuraciones.EsconderBarra(findViewById(R.id.view_Principal));
                         if (Timer != null) {
                             Timer.cancel();
                         }
                         Timer = null;
                         int tiempo = (minutos * 60 + segundos) * 1000;
+
                         if (!encendido && tiempo > 0) {
                             Encender(null);
                         }
@@ -257,6 +312,7 @@ public class Principal extends AppCompatActivity {
                             Timer = new CountDownTimer(tiempo, 1000) {
 
                                 public void onTick(long millisUntilFinished) {
+                                    Configuraciones.EsconderBarra(findViewById(R.id.view_Principal));
                                     if (segundos == 0) {
                                         if (minutos > 0) {
                                             minutos--;
@@ -277,10 +333,13 @@ public class Principal extends AppCompatActivity {
                                     minutos = 0;
                                     segundos = 0;
                                     if (prendioConFlash) {
-                                        flash = true;
+
+                                        flash = flash ? true : false;
                                         Encender(null);
-                                        flash = false;
+
+                                        Configuraciones.EsconderBarra(findViewById(R.id.view_Principal));
                                     }
+
                                 }
                             }.start();
                         } else {
@@ -320,33 +379,39 @@ public class Principal extends AppCompatActivity {
                 .setCustomBigContentView(remoteV)
                 .setContentIntent(pending);
     }
-
+    LayoutInflater inflater ;
+    View view ;
+    ProgressBar np;
+    Toast toast;
+    public void crearToast(){
+        inflater = getLayoutInflater();
+        view = inflater.inflate(R.layout.toast_p, (ViewGroup) findViewById(R.id.relativeLayout1));
+        np = view.findViewById(R.id.pbToast);
+        //toast.setDuration(Toast.LENGTH_LONG);
+        toast = new Toast(getApplicationContext());
+    }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        LayoutInflater inflater = getLayoutInflater();
-        View view = inflater.inflate(R.layout.toast_p, (ViewGroup) findViewById(R.id.relativeLayout1));
-        ProgressBar np = view.findViewById(R.id.pbToast);
-        Toast toast = new Toast(getApplicationContext());
+
         toast.setView(view);
         toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL,0,100);
 
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP)  {
-           Configuraciones.intermitencia++;
+            Configuraciones.intermitencia = Configuraciones.intermitencia > 9 ? 10 : Configuraciones.intermitencia + 1;
+
             np.setProgress( Configuraciones.intermitencia);
 
             toast.show();
-
             return true; }
         if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            Configuraciones.intermitencia--;
+            Configuraciones.intermitencia = Configuraciones.intermitencia < 1 ? 0 : Configuraciones.intermitencia - 1;
+
             np.setProgress( Configuraciones.intermitencia);
 
             toast.show();
-
             return true; }
         if(keyCode == KeyEvent.KEYCODE_HEADSETHOOK) {
             Encender(null);
-
             return true; }
 
         return super.onKeyDown(keyCode, event);
@@ -354,9 +419,37 @@ public class Principal extends AppCompatActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
-        //Encender(null);
-        //super.onNewIntent(intent);
         finish();
+    }
+
+
+    public final static int REQUEST_CODE = 10101;
+
+
+    public boolean checkDrawOverlayPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        if (!Settings.canDrawOverlays(this)) {
+            /** if not construct intent to request permission */
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            /** request permission via start activity for result */
+            startActivityForResult(intent, REQUEST_CODE);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    @TargetApi(Build.VERSION_CODES.M)
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            if (Settings.canDrawOverlays(this)) {
+                startService(new Intent(this, Servicio.class));
+            }
+        }
     }
 }
 

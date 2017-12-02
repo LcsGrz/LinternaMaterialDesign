@@ -5,10 +5,18 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import java.util.List;
 import java.util.Random;
 
 public class LinternaPantalla extends AppCompatActivity implements GestureDetector.OnGestureListener {
@@ -39,6 +47,8 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
         //-------------------------------------------------------
         if (Configuraciones.tiempoColor > 0){iniciarTimer();}
         if(getIntent().getExtras().getInt("apagar")>0){iniciarTimerApagado();}
+        //-------------------------------------------------------
+        crearToast();
     }
 
     @Override
@@ -47,6 +57,43 @@ public class LinternaPantalla extends AppCompatActivity implements GestureDetect
             timer.cancel();
         }
         super.onDestroy();
+    }
+    //--------------------------------------------------------------------------------------------
+    LayoutInflater inflater ;
+    View view ;
+    ProgressBar np;
+    Toast toast;
+    public void crearToast(){
+        inflater = getLayoutInflater();
+        view = inflater.inflate(R.layout.toast_p, (ViewGroup) findViewById(R.id.relativeLayout1));
+        np = view.findViewById(R.id.pbToast);
+        toast = new Toast(getApplicationContext());
+    }
+    //--------------------------------------------------------------------------------------------
+    private float aux[] = {0.01f,0.05f,0,1,2,3,4};
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        toast.setView(view);
+        toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL,0,100);
+
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP)  {
+            Configuraciones.intermitencia+=1;
+            np.setProgress(Configuraciones.intermitencia);
+
+            //Configuraciones.tiempoColor = aux[Configuraciones.intermitencia];
+
+            toast.show();
+            return true; }
+        if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            Configuraciones.intermitencia-=1;
+            np.setProgress(Configuraciones.intermitencia);
+
+            //Configuraciones.tiempoColor = aux[Configuraciones.intermitencia];
+
+            toast.show();
+            return true; }
+        return super.onKeyDown(keyCode, event);
     }
 
     //----------------------------------------------------------------------------------------------
