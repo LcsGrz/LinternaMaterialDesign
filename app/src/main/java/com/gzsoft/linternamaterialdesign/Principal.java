@@ -12,7 +12,6 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.view.View;
@@ -32,13 +31,10 @@ public class Principal extends AppCompatActivity {
     RemoteViews remoteV;
     NotificationCompat.Builder builder;
 
-    Vibrator vibrador;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.actv_principal);
-        vibrador = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         Configuraciones.EsconderBarra(findViewById(R.id.view_Principal)); //Elimino la barra de navegacion
         VerificarPermisoCamara(); //Verifico si el permiso esta activado
         PrepararCamara(); // Verifica si tiene camara y flash
@@ -69,7 +65,7 @@ public class Principal extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------VERIFICAR PERMISO
     private void VerificarPermisoCamara() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, 123);
             }
@@ -83,7 +79,7 @@ public class Principal extends AppCompatActivity {
                 Toast.makeText(this, "Por favor activa el permiso", Toast.LENGTH_LONG).show();
                 VerificarPermisoCamara();
             }
-        }else {
+        } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
         Switch.setImageResource(R.drawable.switch_flash_on);
@@ -121,7 +117,6 @@ public class Principal extends AppCompatActivity {
     ImageView Rayo;
 
     public void Encender(View v) {
-        vibrador.vibrate(55);
         if (flash) {
             try {
                 if (camara != null) {
@@ -156,7 +151,7 @@ public class Principal extends AppCompatActivity {
                 PrepararCamara();
             }
         } else {
-            Intent intent = new Intent(getApplicationContext(), LinternaPantalla.class);
+            Intent intent = new Intent(findViewById(R.id.view_Principal).getContext(), LinternaPantalla.class);
             intent.putExtra("apagar", ((minutos * 60 + segundos) * 1000));
             startActivity(intent);
 
@@ -166,7 +161,6 @@ public class Principal extends AppCompatActivity {
     boolean flash = true;
 
     public void CambiarModo(View v) {
-        vibrador.vibrate(40);
         if (!conProblemas) { //Si no hubo problemas con la camara, me permite cambiar los tipos de linterna
             flash = !flash;
             if (flash) {
